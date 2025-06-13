@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Planetary.Application.Common.Interfaces;
 
 namespace Planetary.Application
 {

@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Planetary.Application\Planetary.Application.csproj" />
+    <ProjectReference Include="..\Planetary.Domain\Planetary.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
