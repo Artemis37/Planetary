@@ -1,0 +1,6 @@
+services:
+  planetary.webapi:
+    image: ${DOCKER_REGISTRY-}planetarywebapi
+    build:
+      context: .
+      dockerfile: Planetary.WebApi/Dockerfile
