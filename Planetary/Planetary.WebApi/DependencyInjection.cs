@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Planetary.Application;
+﻿using Planetary.Application;
+using Planetary.Application.Interfaces;
 using Planetary.Infrastructure;
+using Planetary.Infrastructure.Repositories;
 
 namespace Planetary.WebApi
 {
@@ -11,6 +12,8 @@ namespace Planetary.WebApi
             services
                 .AddApplication()
                 .AddInfrastructure(configuration);
+
+            services.AddScoped<ICriteriaRepository, CriteriaRepository>();
 
             return services;
         }

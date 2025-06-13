@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Planetary.Application
 {
@@ -6,8 +7,8 @@ namespace Planetary.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            // Register application services here
-            //services.AddScoped<IPlanetaryDbContext, PlanetaryDbContext>();
+            // Register MediatR
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             
             return services;
         }

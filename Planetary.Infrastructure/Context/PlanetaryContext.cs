@@ -2,22 +2,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Planetary.Application.Interfaces;
 using Planetary.Domain.Models;
 
 namespace Planetary.Infrastructure.Context
 {
-    public class PlanetaryContext : DbContext, IPlanetaryDbContext
+    public class PlanetaryContext(DbContextOptions<PlanetaryContext> options) : DbContext(options)
     {
-        public PlanetaryContext(DbContextOptions<PlanetaryContext> options) 
-            : base(options)
-        {
-        }
-
-        public DbSet<Planet> Planets => Set<Planet>();
-        public DbSet<Criteria> Criteria => Set<Criteria>();
-        public DbSet<PlanetCriteria> PlanetCriteria => Set<PlanetCriteria>();
-        public DbSet<User> Users => Set<User>();
+        public DbSet<Planet> Planets { get; set; }
+        public DbSet<Criteria> Criteria { get; set; }
+        public DbSet<PlanetCriteria> PlanetCriteria { get; set; }
+        public DbSet<User> Users { set; get; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
