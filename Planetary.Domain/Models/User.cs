@@ -39,19 +39,17 @@ namespace Planetary.Domain.Models
         public string PasswordHash { get; private set; } = string.Empty;
         public string FirstName { get; private set; } = string.Empty;
         public string LastName { get; private set; } = string.Empty;
-        public string Role { get; private set; } = string.Empty; // e.g. Admin, Researcher, Viewer
+        public string Role { get; private set; } = string.Empty; 
         public bool IsActive { get; private set; } = true;
         public string Organization { get; private set; } = string.Empty;
         public string JobTitle { get; private set; } = string.Empty;
         public string ResearchInterests { get; private set; } = string.Empty;
         public DateTime CreatedDate { get; private set; }
         public DateTime? LastLoginDate { get; private set; }
-        public string PreferredPlanetarySystem { get; private set; } = string.Empty; // User's area of interest
+        public string PreferredPlanetarySystem { get; private set; } = string.Empty; 
 
-        // Read-only public property that exposes the private list
         public IReadOnlyCollection<string> FavoritePlanets => _favoritePlanets.AsReadOnly();
 
-        // Methods to manipulate the private collection
         public void AddFavoritePlanet(string planetName)
         {
             if (string.IsNullOrWhiteSpace(planetName))
