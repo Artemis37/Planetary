@@ -65,5 +65,12 @@ namespace Planetary.Infrastructure.Repositories
         {
             return await _context.Planets.AnyAsync(p => p.Id == id);
         }
+
+        public async Task<bool> AddCriteria(IEnumerable<PlanetCriteria> planetCriterias)
+        {
+            await _context.PlanetCriteria.AddRangeAsync(planetCriterias);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
+        }
     }
 }

@@ -11,5 +11,7 @@ namespace Planetary.Application.Interfaces
         Task UpdateAsync(Planet planet);
         Task DeleteAsync(Guid id);
         Task<bool> ExistsAsync(Guid id);
+
+        Task<bool> AddCriteria(IEnumerable<PlanetCriteria> planetCriterias);
     }
 }

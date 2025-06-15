@@ -87,7 +87,7 @@ namespace Planetary.Application.Commands
             planet.SetPlanetType(request.PlanetType);
             planet.UpdateDiscoveryDate(request.DiscoveryDate);
 
-            //planet.EmptyCriteria();
+            planet.EmptyCriteria();
 
             //if (request.Criteria != null && request.Criteria.Count > 0)
             //{
@@ -111,6 +111,24 @@ namespace Planetary.Application.Commands
             //}
 
             await _repository.UpdateAsync(planet);
+
+            if (request.Criteria != null && request.Criteria.Count > 0)
+            {
+                var planetCriteria = request.Criteria.Select(criteriaDto =>
+                {
+                    return new PlanetCriteria(
+                        planet.Id,
+                        criteriaDto.CriteriaId,
+                        criteriaDto.Value,
+                        criteriaDto.Score,
+                        criteriaDto.IsMet,
+                        criteriaDto.Notes
+                    );
+                }).Where(pc => pc != null).ToList();
+
+                await _repository.AddCriteria(planetCriteria);
+            }
+
             return planet;
         }
     }
