@@ -39,7 +39,7 @@ namespace Planetary.WebApi.Controllers
         public async Task<IActionResult> Create(AddCriteriaCommand command)
         {
             var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id = result }, result);
+            return Ok(result.Id);
         }
 
         [HttpPut("{id:guid}")]
@@ -50,7 +50,7 @@ namespace Planetary.WebApi.Controllers
                 return BadRequest("ID mismatch");
 
             var result = await _mediator.Send(command);
-            return result != null ? Ok(result) : NotFound();
+            return result != null ? Ok(result.Id) : NotFound();
         }
 
         [HttpDelete("{id:guid}")]
