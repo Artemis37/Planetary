@@ -39,7 +39,6 @@ namespace Planetary.Infrastructure.Context
                 .HasForeignKey(pc => pc.PlanetId)
                 .OnDelete(DeleteBehavior.Restrict);
                 
-            // Configure the foreign key relationship to User
             builder.HasOne(p => p.User)
                 .WithMany(u => u.Planets)
                 .HasForeignKey(p => p.UserId)
@@ -67,6 +66,9 @@ namespace Planetary.Infrastructure.Context
         private void ConfigurePlanetCriteria(EntityTypeBuilder<PlanetCriteria> builder)
         {
             builder.HasKey(pc => pc.Id);
+
+            builder.Property(pc => pc.Id)
+                .ValueGeneratedOnAdd();
         }
 
         private void ConfigureUser(EntityTypeBuilder<User> builder)

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Planetary.Application.Interfaces;
+using Planetary.Domain.Models;
 using System.Security.Claims;
 
 namespace Planetary.WebApi.Authorization
@@ -29,6 +30,17 @@ namespace Planetary.WebApi.Authorization
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
             {
                 return; // No valid user ID found in claims
+            }
+
+            if (context.User.IsInRole("SuperAdmin"))
+            {
+                context.Succeed(requirement);
+                return;
+            }
+
+            if (!context.User.IsInRole("PlanetAdmin"))
+            {
+                return;
             }
 
             var planetId = Guid.Empty;

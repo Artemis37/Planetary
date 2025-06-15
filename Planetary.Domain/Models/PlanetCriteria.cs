@@ -31,13 +31,12 @@ namespace Planetary.Domain.Models
         public Guid Id { get; private set; }
         public Guid PlanetId { get; private set; }
         public Guid CriteriaId { get; private set; }
-        public double Value { get; private set; } // the actual value measured for this planet and criterion
-        public double Score { get; private set; } // calculated score based on how well the planet meets the criterion
-        public bool IsMet { get; private set; } // whether the planet meets this criterion
+        public double Value { get; private set; }
+        public double Score { get; private set; }
+        public bool IsMet { get; private set; }
         public string Notes { get; private set; } = string.Empty;
         public DateTime EvaluationDate { get; private set; }
         
-        // Navigation properties
         public virtual Planet Planet { get; private set; } = null!;
         public virtual Criteria Criteria { get; private set; } = null!;
         
@@ -58,12 +57,6 @@ namespace Planetary.Domain.Models
         {
             Notes = notes;
             EvaluationDate = DateTime.UtcNow;
-        }
-        
-        public void SetNavigationProperties(Planet planet, Criteria criteria)
-        {
-            Planet = planet ?? throw new ArgumentNullException(nameof(planet));
-            Criteria = criteria ?? throw new ArgumentNullException(nameof(criteria));
         }
     }
 }

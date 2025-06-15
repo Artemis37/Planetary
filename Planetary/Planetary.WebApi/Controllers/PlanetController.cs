@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Planetary.Application.Commands;
+using Planetary.Application.DTOs;
 using Planetary.Application.Queries;
 
 namespace Planetary.WebApi.Controllers
@@ -32,31 +33,13 @@ namespace Planetary.WebApi.Controllers
             return result != null ? Ok(result) : NotFound();
         }
 
-        //[HttpPost]
-        //[Authorize(Policy = "PlanetAdmin")]
-        //public async Task<IActionResult> Create(AddPlanetCommand command)
-        //{
-        //    var result = await _mediator.Send(command);
-        //    return CreatedAtAction(nameof(GetById), new { id = result }, result);
-        //}
-
         [HttpPut("{id}")]
         [Authorize(Policy = "EditPlanet")]
         public async Task<IActionResult> Update(Guid id, UpdatePlanetCommand command)
         {
-            // Set the PlanetId from the route
-            command.PlanetId = id;
-            
+            command.PlanetId = id;            
             var result = await _mediator.Send(command);
             return result != null ? Ok(result) : NotFound();
         }
-
-        //[HttpDelete("{id}")]
-        //[Authorize(Policy = "PlanetAdmin")]
-        //public async Task<IActionResult> Delete(Guid id)
-        //{
-        //    var result = await _mediator.Send(new DeletePlanetCommand { Id = id });
-        //    return result ? NoContent() : NotFound();
-        //}
     }
 }

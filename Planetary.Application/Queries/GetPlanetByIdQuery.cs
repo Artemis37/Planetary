@@ -1,15 +1,16 @@
 using MediatR;
+using Planetary.Application.DTOs;
 using Planetary.Application.Interfaces;
 using Planetary.Domain.Models;
 
 namespace Planetary.Application.Queries
 {
-    public class GetPlanetByIdQuery : IRequest<Planet?>
+    public class GetPlanetByIdQuery : IRequest<PlanetWithCriteriaDto?>
     {
         public Guid Id { get; set; }
     }
 
-    public class GetPlanetByIdQueryHandler : IRequestHandler<GetPlanetByIdQuery, Planet?>
+    public class GetPlanetByIdQueryHandler : IRequestHandler<GetPlanetByIdQuery, PlanetWithCriteriaDto?>
     {
         private readonly IPlanetRepository _repository;
 
@@ -18,9 +19,15 @@ namespace Planetary.Application.Queries
             _repository = repository;
         }
 
-        public async Task<Planet?> Handle(GetPlanetByIdQuery request, CancellationToken cancellationToken)
+        public async Task<PlanetWithCriteriaDto?> Handle(GetPlanetByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _repository.GetByIdAsync(request.Id);
+            var planet = await _repository.GetByIdAsync(request.Id);
+            if (planet == null)
+            {
+                return null;
+            }
+
+            return PlanetWithCriteriaDto.FromPlanet(planet);
         }
     }
 }
