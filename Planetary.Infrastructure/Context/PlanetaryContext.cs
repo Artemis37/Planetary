@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Planetary.Domain.Models;
 
 namespace Planetary.Infrastructure.Context
@@ -38,6 +37,12 @@ namespace Planetary.Infrastructure.Context
             builder.HasMany(p => p.PlanetCriteria)
                 .WithOne(pc => pc.Planet)
                 .HasForeignKey(pc => pc.PlanetId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            // Configure the foreign key relationship to User
+            builder.HasOne(p => p.User)
+                .WithMany(u => u.Planets)
+                .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
@@ -81,23 +86,6 @@ namespace Planetary.Infrastructure.Context
 
             builder.HasIndex(u => u.Email)
                 .IsUnique();
-
-            // ValueConverter
-            var converter = new ValueConverter<IReadOnlyCollection<string>, string>(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList().AsReadOnly()
-            );
-
-            // ValueComparer
-            var comparer = new ValueComparer<IReadOnlyCollection<string>>(
-                (c1, c2) => c1 != null && c2 != null && c1.SequenceEqual(c2),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => c.ToList().AsReadOnly()
-            );
-
-            builder.Property(u => u.FavoritePlanets)
-                .HasConversion(converter)
-                .Metadata.SetValueComparer(comparer);
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

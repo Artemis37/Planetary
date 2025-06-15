@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Planetary.Application.Commands;
 using Planetary.Application.Queries;
@@ -9,6 +10,7 @@ namespace Planetary.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "Viewer")]
     public class CriteriaController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -19,64 +21,44 @@ namespace Planetary.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Criteria>>> GetAllCriteria()
+        public async Task<IActionResult> GetAll()
         {
-            var query = new GetAllCriteriaQuery();
-            var result = await _mediator.Send(query);
+            var result = await _mediator.Send(new GetAllCriteriaQuery());
             return Ok(result);
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<Criteria>> GetCriteriaById([FromRoute] Guid id)
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            var query = new GetCriteriaByIdQuery { Id = id };
-            var result = await _mediator.Send(query);
-
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
+            var result = await _mediator.Send(new GetCriteriaByIdQuery { Id = id });
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Criteria>> AddCriteria([FromBody] AddCriteriaCommand command)
+        [Authorize(Policy = "EditCriteria")]
+        public async Task<IActionResult> Create(AddCriteriaCommand command)
         {
             var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetCriteriaById), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result }, result);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateCriteria([FromRoute] Guid id, [FromBody] UpdateCriteriaCommand command)
+        [Authorize(Policy = "EditCriteria")]
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateCriteriaCommand command)
         {
             if (id != command.Id)
-            {
-                return BadRequest("The ID in the URL must match the ID in the request body");
-            }
-            
+                return BadRequest("ID mismatch");
+
             var result = await _mediator.Send(command);
-            
-            if (result == null)
-            {
-                return NotFound();
-            }
-            
-            return Ok(result);
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> DeleteCriteria([FromRoute] Guid id)
+        [Authorize(Policy = "EditCriteria")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var command = new DeleteCriteriaByIdCommand { Id = id };
-            var result = await _mediator.Send(command);
-            
-            if (!result)
-            {
-                return NotFound();
-            }
-            
-            return NoContent();
+            var result = await _mediator.Send(new DeleteCriteriaByIdCommand { Id = id });
+            return result ? NoContent() : NotFound();
         }
     }
 }

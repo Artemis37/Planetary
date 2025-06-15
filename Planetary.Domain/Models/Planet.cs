@@ -17,7 +17,8 @@ namespace Planetary.Domain.Models
             string stellarSystem, 
             double distanceFromEarth,
             double radius,
-            double mass)
+            double mass,
+            Guid userId)
         {
             Id = Guid.NewGuid();
             Name = name;
@@ -26,6 +27,7 @@ namespace Planetary.Domain.Models
             Radius = radius;
             Mass = mass;
             DiscoveryDate = DateTime.UtcNow;
+            UserId = userId;
         }
 
         public Guid Id { get; private set; }
@@ -43,11 +45,11 @@ namespace Planetary.Domain.Models
         public double WaterCoverage { get; private set; } // percentage
         public string PlanetType { get; private set; } = string.Empty; // e.g. Terrestrial, Gas Giant, etc.
         public DateTime DiscoveryDate { get; private set; }
+        public Guid UserId { get; private set; }
+        public User? User { get; private set; }
         
-        // Read-only public property that exposes the private list
         public IReadOnlyCollection<PlanetCriteria> PlanetCriteria => _planetCriteria.AsReadOnly();
 
-        // Methods to manipulate the private collection
         public void AddCriteria(PlanetCriteria criteria)
         {
             if (criteria == null)
@@ -106,6 +108,11 @@ namespace Planetary.Domain.Models
         public void UpdateDiscoveryDate(DateTime discoveryDate)
         {
             DiscoveryDate = discoveryDate;
+        }
+
+        public void UpdateUserId(Guid userId)
+        {
+            UserId = userId;
         }
     }
 }

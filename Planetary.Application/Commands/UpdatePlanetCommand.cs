@@ -21,6 +21,7 @@ namespace Planetary.Application.Commands
         public double WaterCoverage { get; set; }
         public string PlanetType { get; set; } = string.Empty;
         public DateTime DiscoveryDate { get; set; }
+        public Guid UserId { get; set; }
     }
 
     public class UpdatePlanetCommandHandler : IRequestHandler<UpdatePlanetCommand, Planet?>
@@ -69,6 +70,7 @@ namespace Planetary.Application.Commands
 
             planet.SetPlanetType(request.PlanetType);
             planet.UpdateDiscoveryDate(request.DiscoveryDate);
+            planet.UpdateUserId(request.UserId);
 
             await _repository.UpdateAsync(planet);
             return planet;

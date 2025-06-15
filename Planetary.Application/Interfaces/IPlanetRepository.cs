@@ -6,6 +6,7 @@ namespace Planetary.Application.Interfaces
     {
         Task<IEnumerable<Planet>> GetAllAsync();
         Task<Planet?> GetByIdAsync(Guid id);
+        Task<IEnumerable<Planet>> GetPlanetsByUserIdAsync(Guid userId);
         Task<Planet> AddAsync(Planet planet);
         Task UpdateAsync(Planet planet);
         Task DeleteAsync(Guid id);

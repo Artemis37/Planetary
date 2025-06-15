@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Planetary.Application.Interfaces;
 using Planetary.Infrastructure.Context;
 using Planetary.Infrastructure.Repositories;
+using Planetary.Infrastructure.Services;
 
 namespace Planetary.Infrastructure
 {
@@ -35,6 +36,10 @@ namespace Planetary.Infrastructure
             // Register repositories
             services.AddScoped<ICriteriaRepository, CriteriaRepository>();
             services.AddScoped<IPlanetRepository, PlanetRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            // Register services
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

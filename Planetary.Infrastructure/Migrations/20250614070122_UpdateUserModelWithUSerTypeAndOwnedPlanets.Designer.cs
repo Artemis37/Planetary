@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Planetary.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using Planetary.Infrastructure.Context;
 namespace Planetary.Infrastructure.Migrations
 {
     [DbContext(typeof(PlanetaryContext))]
-    partial class PlanetaryContextModelSnapshot : ModelSnapshot
+    [Migration("20250614070122_UpdateUserModelWithUSerTypeAndOwnedPlanets")]
+    partial class UpdateUserModelWithUSerTypeAndOwnedPlanets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,15 +121,10 @@ namespace Planetary.Infrastructure.Migrations
                     b.Property<double>("SurfaceTemperature")
                         .HasColumnType("float");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<double>("WaterCoverage")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Planets");
                 });
@@ -182,6 +180,10 @@ namespace Planetary.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("FavoritePlanets")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -201,6 +203,10 @@ namespace Planetary.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Organization")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OwnedPlanetIds")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -235,17 +241,6 @@ namespace Planetary.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Planetary.Domain.Models.Planet", b =>
-                {
-                    b.HasOne("Planetary.Domain.Models.User", "User")
-                        .WithMany("Planets")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Planetary.Domain.Models.PlanetCriteria", b =>
                 {
                     b.HasOne("Planetary.Domain.Models.Criteria", "Criteria")
@@ -273,11 +268,6 @@ namespace Planetary.Infrastructure.Migrations
             modelBuilder.Entity("Planetary.Domain.Models.Planet", b =>
                 {
                     b.Navigation("PlanetCriteria");
-                });
-
-            modelBuilder.Entity("Planetary.Domain.Models.User", b =>
-                {
-                    b.Navigation("Planets");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Planetary.Domain.Models
 {
     public class User
     {
-        private readonly List<string> _favoritePlanets = new();
-
         public User()
         {
             Id = Guid.NewGuid();
             IsActive = true;
             CreatedDate = DateTime.UtcNow;
+            UserType = UserType.Viewer; // Default role
         }
 
         public User(
@@ -20,7 +20,7 @@ namespace Planetary.Domain.Models
             string passwordHash,
             string firstName,
             string lastName,
-            string role)
+            UserType userType)
         {
             Id = Guid.NewGuid();
             Username = username;
@@ -28,7 +28,7 @@ namespace Planetary.Domain.Models
             PasswordHash = passwordHash;
             FirstName = firstName;
             LastName = lastName;
-            Role = role;
+            UserType = userType;
             IsActive = true;
             CreatedDate = DateTime.UtcNow;
         }
@@ -39,30 +39,19 @@ namespace Planetary.Domain.Models
         public string PasswordHash { get; private set; } = string.Empty;
         public string FirstName { get; private set; } = string.Empty;
         public string LastName { get; private set; } = string.Empty;
-        public string Role { get; private set; } = string.Empty; 
+        public UserType UserType { get; private set; }
         public bool IsActive { get; private set; } = true;
         public string Organization { get; private set; } = string.Empty;
         public string JobTitle { get; private set; } = string.Empty;
         public string ResearchInterests { get; private set; } = string.Empty;
         public DateTime CreatedDate { get; private set; }
         public DateTime? LastLoginDate { get; private set; }
-        public string PreferredPlanetarySystem { get; private set; } = string.Empty; 
-
-        public IReadOnlyCollection<string> FavoritePlanets => _favoritePlanets.AsReadOnly();
-
-        public void AddFavoritePlanet(string planetName)
-        {
-            if (string.IsNullOrWhiteSpace(planetName))
-                throw new ArgumentException("Planet name cannot be empty", nameof(planetName));
-
-            if (!_favoritePlanets.Contains(planetName))
-                _favoritePlanets.Add(planetName);
-        }
-
-        public void RemoveFavoritePlanet(string planetName)
-        {
-            _favoritePlanets.Remove(planetName);
-        }
+        public string PreferredPlanetarySystem { get; private set; } = string.Empty;
+        // For backward compatibility
+        public string Role => UserType.ToString();
+        
+        // Navigation property for planets owned by this user
+        public ICollection<Planet> Planets { get; private set; } = new List<Planet>();
 
         public void SetLastLogin()
         {
@@ -93,12 +82,9 @@ namespace Planetary.Domain.Models
             PasswordHash = passwordHash;
         }
 
-        public void UpdateRole(string role)
+        public void UpdateUserType(UserType userType)
         {
-            if (string.IsNullOrWhiteSpace(role))
-                throw new ArgumentException("Role cannot be empty", nameof(role));
-
-            Role = role;
+            UserType = userType;
         }
 
         public void SetActiveStatus(bool isActive)
@@ -120,6 +106,12 @@ namespace Planetary.Domain.Models
             JobTitle = jobTitle;
             ResearchInterests = researchInterests;
             PreferredPlanetarySystem = preferredPlanetarySystem;
+        }
+
+        public bool IsOwnerOfPlanet(Guid planetId)
+        {
+            return UserType == UserType.SuperAdmin || 
+                   Planets.Any(p => p.Id == planetId);
         }
     }
 }

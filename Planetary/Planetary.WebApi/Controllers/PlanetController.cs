@@ -1,13 +1,14 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Planetary.Application.Commands;
 using Planetary.Application.Queries;
-using Planetary.Domain.Models;
 
 namespace Planetary.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "Viewer")]
     public class PlanetController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -18,43 +19,44 @@ namespace Planetary.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Planet>>> GetAllPlanets()
+        public async Task<IActionResult> GetAll()
         {
-            var query = new GetAllPlanetQuery();
-            var result = await _mediator.Send(query);
+            var result = await _mediator.Send(new GetAllPlanetQuery());
             return Ok(result);
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<Planet>> GetPlanetById([FromRoute] Guid id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
         {
-            var query = new GetPlanetByIdQuery { Id = id };
-            var result = await _mediator.Send(query);
-
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
+            var result = await _mediator.Send(new GetPlanetByIdQuery { Id = id });
+            return result != null ? Ok(result) : NotFound();
         }
 
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdatePlanet([FromRoute] Guid id, [FromBody] UpdatePlanetCommand command)
+        //[HttpPost]
+        //[Authorize(Policy = "PlanetAdmin")]
+        //public async Task<IActionResult> Create(AddPlanetCommand command)
+        //{
+        //    var result = await _mediator.Send(command);
+        //    return CreatedAtAction(nameof(GetById), new { id = result }, result);
+        //}
+
+        [HttpPut("{id}")]
+        [Authorize(Policy = "EditPlanet")]
+        public async Task<IActionResult> Update(Guid id, UpdatePlanetCommand command)
         {
             if (id != command.Id)
-            {
-                return BadRequest("The ID in the URL must match the ID in the request body");
-            }
-            
+                return BadRequest("ID mismatch");
+
             var result = await _mediator.Send(command);
-            
-            if (result == null)
-            {
-                return NotFound();
-            }
-            
-            return Ok(result);
+            return result != null ? Ok(result) : NotFound();
         }
+
+        //[HttpDelete("{id}")]
+        //[Authorize(Policy = "PlanetAdmin")]
+        //public async Task<IActionResult> Delete(Guid id)
+        //{
+        //    var result = await _mediator.Send(new DeletePlanetCommand { Id = id });
+        //    return result ? NoContent() : NotFound();
+        //}
     }
 }

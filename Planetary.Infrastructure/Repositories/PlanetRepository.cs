@@ -31,6 +31,13 @@ namespace Planetary.Infrastructure.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<IEnumerable<Planet>> GetPlanetsByUserIdAsync(Guid userId)
+        {
+            return await _context.Planets
+                .Where(p => p.UserId == userId)
+                .ToListAsync();
+        }
+
         public async Task<Planet> AddAsync(Planet planet)
         {
             await _context.Planets.AddAsync(planet);
