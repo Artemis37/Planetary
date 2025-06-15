@@ -1,16 +1,29 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Planetary.Domain.Models;
 using Planetary.Infrastructure.Context;
 using Planetary.WebApi;
+using Planetary.WebApi.Authorization;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Configure CORS to allow all origins
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 // Configure JWT Authentication
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
@@ -37,6 +50,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Register authorization handler
+builder.Services.AddScoped<IAuthorizationHandler, PlanetOwnershipHandler>();
+
 // Configure Policy-Based Authorization
 builder.Services.AddAuthorization(options =>
 {
@@ -46,12 +62,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Viewer", policy => policy.RequireRole(UserType.Viewer.ToString(), UserType.PlanetAdmin.ToString(), UserType.SuperAdmin.ToString()));
 
     // Resource-Based Policies
-    options.AddPolicy("EditPlanet", policy =>
-        policy.RequireAssertion(context =>
-            context.User.IsInRole(UserType.SuperAdmin.ToString()) || 
-            (context.User.IsInRole(UserType.PlanetAdmin.ToString()) && 
-             context.Resource != null && 
-             context.User.HasClaim(c => c.Type == "OwnedPlanet" && c.Value == ((Guid)context.Resource).ToString()))));
+    options.AddPolicy("EditPlanet", policy => {
+        policy.RequireRole(UserType.PlanetAdmin.ToString(), UserType.SuperAdmin.ToString());
+        policy.Requirements.Add(new PlanetOwnershipRequirement());
+    });
 
     options.AddPolicy("EditCriteria", policy =>
         policy.RequireRole(UserType.SuperAdmin.ToString()));
@@ -120,6 +134,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Use CORS before authentication and authorization
+app.UseCors();
 
 // Add the authentication middleware before authorization
 app.UseAuthentication();

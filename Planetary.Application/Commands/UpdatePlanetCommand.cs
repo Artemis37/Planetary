@@ -6,7 +6,7 @@ namespace Planetary.Application.Commands
 {
     public class UpdatePlanetCommand : IRequest<Planet?>
     {
-        public Guid Id { get; set; }
+        public Guid PlanetId { get; set; }  // Changed from Id to PlanetId for better clarity
         public string Name { get; set; } = string.Empty;
         public string StellarSystem { get; set; } = string.Empty;
         public double DistanceFromEarth { get; set; }
@@ -21,7 +21,6 @@ namespace Planetary.Application.Commands
         public double WaterCoverage { get; set; }
         public string PlanetType { get; set; } = string.Empty;
         public DateTime DiscoveryDate { get; set; }
-        public Guid UserId { get; set; }
     }
 
     public class UpdatePlanetCommandHandler : IRequestHandler<UpdatePlanetCommand, Planet?>
@@ -35,7 +34,7 @@ namespace Planetary.Application.Commands
 
         public async Task<Planet?> Handle(UpdatePlanetCommand request, CancellationToken cancellationToken)
         {
-            var planet = await _repository.GetByIdAsync(request.Id);
+            var planet = await _repository.GetByIdAsync(request.PlanetId);
             if (planet == null)
             {
                 return null;
@@ -70,7 +69,6 @@ namespace Planetary.Application.Commands
 
             planet.SetPlanetType(request.PlanetType);
             planet.UpdateDiscoveryDate(request.DiscoveryDate);
-            planet.UpdateUserId(request.UserId);
 
             await _repository.UpdateAsync(planet);
             return planet;

@@ -5,8 +5,6 @@ namespace Planetary.Domain.Models
 {
     public class Criteria
     {
-        private readonly List<PlanetCriteria> _planetCriteria = new();
-
         public Criteria()
         {
             Id = Guid.NewGuid();
@@ -38,19 +36,18 @@ namespace Planetary.Domain.Models
         public Guid Id { get; private set; }
         public string Name { get; private set; } = string.Empty;
         public string Description { get; private set; } = string.Empty;
-        public string Category { get; private set; } = string.Empty; // e.g. Atmospheric, Physical, Biological, etc.
+        public string Category { get; private set; } = string.Empty;
         public double MinimumThreshold { get; private set; }
         public double MaximumThreshold { get; private set; }
         public string Unit { get; private set; } = string.Empty;
-        public double Weight { get; private set; } // importance weight for scoring
-        public bool IsRequired { get; private set; } // whether this is a mandatory criterion
+        public double Weight { get; private set; }
+        public bool IsRequired { get; private set; }
         public DateTime CreatedDate { get; private set; }
         public DateTime? ModifiedDate { get; private set; }
-        
-        // Read-only public property that exposes the private list
+
+        private readonly List<PlanetCriteria> _planetCriteria = new();
         public IReadOnlyCollection<PlanetCriteria> PlanetCriteria => _planetCriteria.AsReadOnly();
 
-        // Methods to manipulate the private collection
         public void AddPlanetCriteria(PlanetCriteria criteria)
         {
             if (criteria == null)

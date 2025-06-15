@@ -44,9 +44,9 @@ namespace Planetary.WebApi.Controllers
         [Authorize(Policy = "EditPlanet")]
         public async Task<IActionResult> Update(Guid id, UpdatePlanetCommand command)
         {
-            if (id != command.Id)
-                return BadRequest("ID mismatch");
-
+            // Set the PlanetId from the route
+            command.PlanetId = id;
+            
             var result = await _mediator.Send(command);
             return result != null ? Ok(result) : NotFound();
         }
