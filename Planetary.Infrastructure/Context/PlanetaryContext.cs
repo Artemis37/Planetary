@@ -37,7 +37,7 @@ namespace Planetary.Infrastructure.Context
             builder.HasMany(p => p.PlanetCriteria)
                 .WithOne(pc => pc.Planet)
                 .HasForeignKey(pc => pc.PlanetId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
                 
             builder.HasOne(p => p.User)
                 .WithMany(u => u.Planets)

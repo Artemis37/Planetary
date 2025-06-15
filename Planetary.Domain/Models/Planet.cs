@@ -58,6 +58,11 @@ namespace Planetary.Domain.Models
             _planetCriteria.Add(criteria);
         }
 
+        public void EmptyCriteria()
+        {
+            _planetCriteria.Clear();
+        }
+
         public void RemoveCriteria(PlanetCriteria criteria)
         {
             _planetCriteria.Remove(criteria);
